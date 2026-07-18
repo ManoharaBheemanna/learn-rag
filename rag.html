@@ -1,284 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>RAG Learning Simulator</title>
-
-<style>
-
-:root {
-    --bg:#07111f;
-    --card:#111c2e;
-    --accent:#38bdf8;
-    --green:#22c55e;
-    --purple:#a78bfa;
-    --text:#e5e7eb;
-}
-
-* {
-    box-sizing:border-box;
-    font-family:"Inter",Arial,sans-serif;
-}
-
-body {
-    margin:0;
-    background:
-    radial-gradient(circle at top,#1e40af,#07111f 45%);
-    color:var(--text);
-}
-
-
-header {
-    text-align:center;
-    padding:40px 20px;
-}
-
-header h1 {
-    font-size:42px;
-    margin:0;
-}
-
-header p {
-    opacity:.8;
-}
-
-
-
-.container {
-    max-width:1200px;
-    margin:auto;
-    padding:20px;
-}
-
-
-.card {
-
-    background:rgba(255,255,255,.08);
-    backdrop-filter:blur(15px);
-
-    border:1px solid rgba(255,255,255,.1);
-
-    border-radius:20px;
-
-    padding:25px;
-
-    margin-bottom:25px;
-
-}
-
-
-
-h2 {
-    color:var(--accent);
-}
-
-
-
-.pipeline {
-
-display:flex;
-gap:15px;
-justify-content:center;
-flex-wrap:wrap;
-
-}
-
-
-.node {
-
-background:#162338;
-
-padding:18px;
-
-border-radius:15px;
-
-min-width:140px;
-
-text-align:center;
-
-transition:.3s;
-
-}
-
-
-.node.active {
-
-background:#0369a1;
-
-transform:scale(1.08);
-
-}
-
-
-.arrow {
-
-font-size:30px;
-color:var(--accent);
-
-}
-
-
-
-textarea,input {
-
-width:100%;
-
-background:#020617;
-
-color:white;
-
-border:none;
-
-padding:15px;
-
-border-radius:12px;
-
-margin:10px 0;
-
-}
-
-
-
-button {
-
-background:linear-gradient(
-135deg,#2563eb,#7c3aed
-);
-
-color:white;
-
-border:none;
-
-padding:14px 22px;
-
-border-radius:12px;
-
-cursor:pointer;
-
-font-size:15px;
-
-}
-
-
-button:hover {
-
-transform:translateY(-2px);
-
-}
-
-
-
-.result {
-
-background:#020617;
-
-padding:20px;
-
-border-radius:15px;
-
-margin-top:15px;
-
-min-height:60px;
-
-}
-
-
-
-.chunk {
-
-background:#1e293b;
-
-padding:15px;
-
-border-radius:12px;
-
-margin:10px 0;
-
-}
-
-
-
-.vector {
-
-color:#a78bfa;
-
-font-family:monospace;
-
-}
-
-
-
-.good {
-
-border:2px solid var(--green);
-
-}
-
-
-
-.score {
-
-color:#22c55e;
-
-font-weight:bold;
-
-}
-
-
-
-.step {
-
-display:flex;
-
-gap:15px;
-
-align-items:center;
-
-margin-bottom:15px;
-
-}
-
-
-
-.circle {
-
-width:40px;
-
-height:40px;
-
-border-radius:50%;
-
-background:#2563eb;
-
-display:flex;
-
-align-items:center;
-
-justify-content:center;
-
-font-weight:bold;
-
-}
-
-
-</style>
-
-</head>
-
-
 <body>
 
-
 <header>
-
 <h1>🧠 RAG Simulator</h1>
-
-<p>
-Learn Retrieval Augmented Generation visually
-</p>
-
+<p>Experiment with your own Knowledge Base and Queries</p>
 </header>
-
 
 
 <div class="container">
@@ -286,8 +11,7 @@ Learn Retrieval Augmented Generation visually
 
 <div class="card">
 
-<h2>RAG Architecture</h2>
-
+<h2>RAG Pipeline</h2>
 
 <div class="pipeline">
 
@@ -295,47 +19,31 @@ Learn Retrieval Augmented Generation visually
 📚 Knowledge Base
 </div>
 
-<div class="arrow">
-→
-</div>
+<div class="arrow">→</div>
 
 <div class="node" id="n2">
 ✂️ Chunking
 </div>
 
-
-<div class="arrow">
-→
-</div>
-
+<div class="arrow">→</div>
 
 <div class="node" id="n3">
 🔢 Embeddings
 </div>
 
-
-<div class="arrow">
-→
-</div>
-
+<div class="arrow">→</div>
 
 <div class="node" id="n4">
 🗄 Vector DB
 </div>
 
-
-<div class="arrow">
-→
-</div>
-
+<div class="arrow">→</div>
 
 <div class="node" id="n5">
 🤖 LLM
 </div>
 
-
 </div>
-
 
 </div>
 
@@ -344,28 +52,28 @@ Learn Retrieval Augmented Generation visually
 
 <div class="card">
 
+<h2>Step 1: Create Your Knowledge Base</h2>
 
-<h2>
-1. Knowledge Base
-</h2>
+<p>
+Paste your own documents here:
+</p>
 
 
-<textarea id="documents">
+<textarea id="documents" rows="8">
+OpenAI creates AI models that help people solve problems.
+RAG allows AI systems to use external knowledge.
+Vector databases store embeddings for similarity search.
 Employees receive 25 vacation days every year.
-Remote employees can work three days from home.
-Refund requests must be submitted within 30 days.
-Premium users get priority customer support.
 </textarea>
 
 
-<button onclick="chunkDocuments()">
-Create Chunks
+<button onclick="buildKnowledgeBase()">
+🚀 Build Knowledge Base
 </button>
 
 
 <div id="chunks" class="result"></div>
 
-
 </div>
 
 
@@ -374,12 +82,10 @@ Create Chunks
 
 <div class="card">
 
-<h2>
-2. Create Embeddings
-</h2>
+<h2>Step 2: Create Vector Database</h2>
 
 
-<button onclick="embedChunks()">
+<button onclick="createEmbeddings()">
 Generate Embeddings
 </button>
 
@@ -395,18 +101,19 @@ Generate Embeddings
 
 <div class="card">
 
-
 <h2>
-3. User Query
+Step 3: Ask Your Question
 </h2>
 
 
-<input id="query"
-value="How many vacation days do employees get?">
+<input 
+id="query"
+placeholder="Ask something from your knowledge base..."
+value="What is RAG?">
 
 
-<button onclick="search()">
-Retrieve Similar Chunks
+<button onclick="retrieve()">
+🔍 Search Knowledge Base
 </button>
 
 
@@ -422,34 +129,29 @@ Retrieve Similar Chunks
 <div class="card">
 
 <h2>
-4. Augmented Prompt
+Step 4: Augmented Prompt
 </h2>
 
 
-<div id="augmented"
-class="result">
-
-Waiting for retrieval...
-
+<div id="prompt" class="result">
+Waiting...
 </div>
 
 
 </div>
-
 
 
 
 
 <div class="card">
 
-
 <h2>
-5. LLM Generation
+Step 5: LLM Answer
 </h2>
 
 
-<button onclick="generate()">
-Generate Answer
+<button onclick="generateAnswer()">
+🤖 Generate Answer
 </button>
 
 
@@ -459,8 +161,8 @@ Generate Answer
 </div>
 
 
-
 </div>
+
 
 
 
@@ -469,17 +171,15 @@ Generate Answer
 
 
 let chunks=[];
-
 let database=[];
-
-let selected=[];
+let retrieved=[];
 
 
 
 function activate(id){
 
 document.querySelectorAll(".node")
-.forEach(x=>x.classList.remove("active"));
+.forEach(n=>n.classList.remove("active"));
 
 document.getElementById(id)
 .classList.add("active");
@@ -489,46 +189,44 @@ document.getElementById(id)
 
 
 
-function chunkDocuments(){
+
+function buildKnowledgeBase(){
 
 
 activate("n2");
 
 
-let text=document
-.getElementById("documents")
-.value;
+let text=
+document.getElementById("documents").value;
+
 
 
 chunks=text
-.split(".")
+.split(/[.!?]/)
 .map(x=>x.trim())
-.filter(Boolean);
+.filter(x=>x.length>0);
 
 
 
-let html="";
+let html="<h3>Generated Chunks:</h3>";
+
 
 
 chunks.forEach((c,i)=>{
-
 
 html+=`
 
 <div class="chunk">
 
-<b>
-Chunk ${i+1}
-</b>
+<b>Chunk ${i+1}</b>
 
 <br>
 
-${c}.
+${c}
 
 </div>
 
 `;
-
 
 });
 
@@ -537,7 +235,20 @@ document.getElementById("chunks")
 .innerHTML=html;
 
 
+
+database=[];
+
+
+document.getElementById("embeddings")
+.innerHTML="Knowledge base updated. Generate embeddings.";
+
+
+document.getElementById("answer")
+.innerHTML="";
+
+
 activate("n1");
+
 
 }
 
@@ -545,23 +256,26 @@ activate("n1");
 
 
 
-function createVector(text){
+
+function createEmbedding(text){
 
 
-let lower=text.toLowerCase();
+let t=text.toLowerCase();
 
 
 return [
 
-lower.length,
+text.length,
 
-(lower.match(/vacation/g)||[]).length,
+t.split(" ").length,
 
-(lower.match(/refund/g)||[]).length,
+(t.match(/ai/g)||[]).length,
 
-(lower.match(/support/g)||[]).length,
+(t.match(/rag/g)||[]).length,
 
-(lower.match(/remote/g)||[]).length
+(t.match(/database/g)||[]).length,
+
+(t.match(/employee|vacation/g)||[]).length
 
 ];
 
@@ -571,34 +285,29 @@ lower.length,
 
 
 
-function embedChunks(){
+
+
+function createEmbeddings(){
 
 
 activate("n3");
 
 
-database=[];
+database=chunks.map(c=>({
 
+content:c,
 
-chunks.forEach(c=>{
+vector:createEmbedding(c)
 
-database.push({
-
-text:c,
-
-vector:createVector(c)
-
-});
-
-
-});
+}));
 
 
 
-let html="";
+let html="<h3>Vector Database:</h3>";
 
 
-database.forEach((item,i)=>{
+
+database.forEach((d,i)=>{
 
 
 html+=`
@@ -606,19 +315,20 @@ html+=`
 <div class="chunk">
 
 <b>
-Chunk ${i+1}
+Vector ${i+1}
 </b>
 
 <br>
 
-${item.text}
+${d.content}
 
 <br><br>
 
 <span class="vector">
 
-Embedding:
-[${item.vector.join(",")}]
+[
+${d.vector.join(",")}
+]
 
 </span>
 
@@ -645,29 +355,47 @@ activate("n4");
 
 
 
-function similarity(a,b){
+
+function cosineSimilarity(a,b){
 
 
-let score=0;
+let dot=0;
+
+let magA=0;
+
+let magB=0;
 
 
-for(let i=0;i<a.length;i++)
+for(let i=0;i<a.length;i++){
 
-score+=Math.abs(a[i]-b[i]);
+dot+=a[i]*b[i];
+
+magA+=a[i]*a[i];
+
+magB+=b[i]*b[i];
+
+}
 
 
-return 1/(1+score);
-
+return dot/(Math.sqrt(magA)*Math.sqrt(magB));
 
 }
 
 
 
 
-function search(){
 
 
-activate("n4");
+function retrieve(){
+
+
+if(database.length===0){
+
+alert("Create embeddings first");
+
+return;
+
+}
 
 
 let query=
@@ -675,62 +403,59 @@ document.getElementById("query")
 .value;
 
 
-let qVector=createVector(query);
+
+let queryVector=createEmbedding(query);
 
 
 
-selected=database
+retrieved=
 
-.map(x=>({
+database.map(d=>({
 
-...x,
+...d,
 
 score:
-similarity(qVector,x.vector)
+cosineSimilarity(
+queryVector,
+d.vector
+)
 
 }))
 
 
 .sort((a,b)=>b.score-a.score)
 
-.slice(0,2);
+.slice(0,3);
 
 
 
 
-let html="";
+
+let html="<h3>Retrieved Context:</h3>";
 
 
-selected.forEach(x=>{
+
+retrieved.forEach(r=>{
 
 
 html+=`
 
 <div class="chunk good">
 
-
-${x.text}
-
+${r.content}
 
 <br>
 
-
-<span class="score">
-
 Similarity:
-${x.score.toFixed(3)}
-
-</span>
-
+<b>
+${r.score.toFixed(3)}
+</b>
 
 </div>
 
-
 `;
 
-
 });
-
 
 
 document.getElementById("retrieved")
@@ -738,13 +463,13 @@ document.getElementById("retrieved")
 
 
 
-document.getElementById("augmented")
+document.getElementById("prompt")
 .innerHTML=
 
 `
 
 <b>
-Final Prompt sent to LLM:
+Prompt sent to LLM
 </b>
 
 
@@ -753,7 +478,7 @@ Final Prompt sent to LLM:
 
 Context:
 
-${selected.map(x=>x.text).join("\n")}
+${retrieved.map(r=>r.content).join("\n")}
 
 
 <br><br>
@@ -763,7 +488,6 @@ Question:
 
 ${query}
 
-
 `;
 
 
@@ -774,46 +498,24 @@ ${query}
 
 
 
-function generate(){
 
 
-activate("n5");
+function generateAnswer(){
 
 
-let q=
+if(retrieved.length===0){
+
+alert("Run retrieval first");
+
+return;
+
+}
+
+
+
+let query=
 document.getElementById("query")
-.value.toLowerCase();
-
-
-
-let answer=
-"";
-
-
-if(q.includes("vacation"))
-
-answer=
-"Employees receive 25 vacation days every year.";
-
-
-else if(q.includes("refund"))
-
-answer=
-"Refund requests must be submitted within 30 days.";
-
-
-else if(q.includes("support"))
-
-answer=
-"Premium users receive priority customer support.";
-
-
-else
-
-answer=
-"Based on retrieved context: "
-+
-selected[0].text;
+.value;
 
 
 
@@ -822,20 +524,23 @@ document.getElementById("answer")
 
 `
 
-<b>
-LLM Answer:
-</b>
+<b>LLM Generated Response:</b>
 
 <br><br>
 
-${answer}
+Based on the retrieved information:
+
+<br><br>
+
+${retrieved[0].content}
 
 
 <br><br>
 
 <small>
-Generated from:
-Query + Retrieved Context
+The LLM used:
+<br>
+User Query + Retrieved Context
 </small>
 
 `;
@@ -843,8 +548,7 @@ Query + Retrieved Context
 }
 
 
+
 </script>
 
-
 </body>
-</html>
