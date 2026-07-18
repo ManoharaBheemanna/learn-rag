@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>RAG Learning Simulator</title>
+
+<style>
+
+:root {
+    --bg:#07111f;
+    --card:#111c2e;
+    --accent:#38bdf8;
+    --green:#22c55e;
+    --purple:#a78bfa;
+    --text:#e5e7eb;
+}
+
+* {
+    box-sizing:border-box;
+    font-family:"Inter",Arial,sans-serif;
+}
+
+body {
+    margin:0;
+    background:
+    radial-gradient(circle at top,#1e40af,#07111f 45%);
+    color:var(--text);
+}
+
+
+header {
+    text-align:center;
+    padding:40px 20px;
+}
+
+header h1 {
+    font-size:42px;
+    margin:0;
+}
+
+header p {
+    opacity:.8;
+}
+
+
+
+.container {
+    max-width:1200px;
+    margin:auto;
+    padding:20px;
+}
+
+
+.card {
+
+    background:rgba(255,255,255,.08);
+    backdrop-filter:blur(15px);
+
+    border:1px solid rgba(255,255,255,.1);
+
+    border-radius:20px;
+
+    padding:25px;
+
+    margin-bottom:25px;
+
+}
+
+
+
+h2 {
+    color:var(--accent);
+}
+
+
+
+.pipeline {
+
+display:flex;
+gap:15px;
+justify-content:center;
+flex-wrap:wrap;
+
+}
+
+
+.node {
+
+background:#162338;
+
+padding:18px;
+
+border-radius:15px;
+
+min-width:140px;
+
+text-align:center;
+
+transition:.3s;
+
+}
+
+
+.node.active {
+
+background:#0369a1;
+
+transform:scale(1.08);
+
+}
+
+
+.arrow {
+
+font-size:30px;
+color:var(--accent);
+
+}
+
+
+
+textarea,input {
+
+width:100%;
+
+background:#020617;
+
+color:white;
+
+border:none;
+
+padding:15px;
+
+border-radius:12px;
+
+margin:10px 0;
+
+}
+
+
+
+button {
+
+background:linear-gradient(
+135deg,#2563eb,#7c3aed
+);
+
+color:white;
+
+border:none;
+
+padding:14px 22px;
+
+border-radius:12px;
+
+cursor:pointer;
+
+font-size:15px;
+
+}
+
+
+button:hover {
+
+transform:translateY(-2px);
+
+}
+
+
+
+.result {
+
+background:#020617;
+
+padding:20px;
+
+border-radius:15px;
+
+margin-top:15px;
+
+min-height:60px;
+
+}
+
+
+
+.chunk {
+
+background:#1e293b;
+
+padding:15px;
+
+border-radius:12px;
+
+margin:10px 0;
+
+}
+
+
+
+.vector {
+
+color:#a78bfa;
+
+font-family:monospace;
+
+}
+
+
+
+.good {
+
+border:2px solid var(--green);
+
+}
+
+
+
+.score {
+
+color:#22c55e;
+
+font-weight:bold;
+
+}
+
+
+
+.step {
+
+display:flex;
+
+gap:15px;
+
+align-items:center;
+
+margin-bottom:15px;
+
+}
+
+
+
+.circle {
+
+width:40px;
+
+height:40px;
+
+border-radius:50%;
+
+background:#2563eb;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+font-weight:bold;
+
+}
+
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<header>
+
+<h1>🧠 RAG Simulator</h1>
+
+<p>
+Learn Retrieval Augmented Generation visually
+</p>
+
+</header>
+
+
+
+<div class="container">
+
+
+<div class="card">
+
+<h2>RAG Architecture</h2>
+
+
+<div class="pipeline">
+
+<div class="node" id="n1">
+📚 Knowledge Base
+</div>
+
+<div class="arrow">
+→
+</div>
+
+<div class="node" id="n2">
+✂️ Chunking
+</div>
+
+
+<div class="arrow">
+→
+</div>
+
+
+<div class="node" id="n3">
+🔢 Embeddings
+</div>
+
+
+<div class="arrow">
+→
+</div>
+
+
+<div class="node" id="n4">
+🗄 Vector DB
+</div>
+
+
+<div class="arrow">
+→
+</div>
+
+
+<div class="node" id="n5">
+🤖 LLM
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+
+<div class="card">
+
+
+<h2>
+1. Knowledge Base
+</h2>
+
+
+<textarea id="documents">
+Employees receive 25 vacation days every year.
+Remote employees can work three days from home.
+Refund requests must be submitted within 30 days.
+Premium users get priority customer support.
+</textarea>
+
+
+<button onclick="chunkDocuments()">
+Create Chunks
+</button>
+
+
+<div id="chunks" class="result"></div>
+
+
+</div>
+
+
+
+
+
+<div class="card">
+
+<h2>
+2. Create Embeddings
+</h2>
+
+
+<button onclick="embedChunks()">
+Generate Embeddings
+</button>
+
+
+<div id="embeddings" class="result"></div>
+
+
+</div>
+
+
+
+
+
+<div class="card">
+
+
+<h2>
+3. User Query
+</h2>
+
+
+<input id="query"
+value="How many vacation days do employees get?">
+
+
+<button onclick="search()">
+Retrieve Similar Chunks
+</button>
+
+
+<div id="retrieved" class="result"></div>
+
+
+</div>
+
+
+
+
+
+<div class="card">
+
+<h2>
+4. Augmented Prompt
+</h2>
+
+
+<div id="augmented"
+class="result">
+
+Waiting for retrieval...
+
+</div>
+
+
+</div>
+
+
+
+
+
+<div class="card">
+
+
+<h2>
+5. LLM Generation
+</h2>
+
+
+<button onclick="generate()">
+Generate Answer
+</button>
+
+
+<div id="answer" class="result"></div>
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+<script>
+
+
+let chunks=[];
+
+let database=[];
+
+let selected=[];
+
+
+
+function activate(id){
+
+document.querySelectorAll(".node")
+.forEach(x=>x.classList.remove("active"));
+
+document.getElementById(id)
+.classList.add("active");
+
+}
+
+
+
+
+function chunkDocuments(){
+
+
+activate("n2");
+
+
+let text=document
+.getElementById("documents")
+.value;
+
+
+chunks=text
+.split(".")
+.map(x=>x.trim())
+.filter(Boolean);
+
+
+
+let html="";
+
+
+chunks.forEach((c,i)=>{
+
+
+html+=`
+
+<div class="chunk">
+
+<b>
+Chunk ${i+1}
+</b>
+
+<br>
+
+${c}.
+
+</div>
+
+`;
+
+
+});
+
+
+document.getElementById("chunks")
+.innerHTML=html;
+
+
+activate("n1");
+
+}
+
+
+
+
+
+function createVector(text){
+
+
+let lower=text.toLowerCase();
+
+
+return [
+
+lower.length,
+
+(lower.match(/vacation/g)||[]).length,
+
+(lower.match(/refund/g)||[]).length,
+
+(lower.match(/support/g)||[]).length,
+
+(lower.match(/remote/g)||[]).length
+
+];
+
+
+}
+
+
+
+
+function embedChunks(){
+
+
+activate("n3");
+
+
+database=[];
+
+
+chunks.forEach(c=>{
+
+database.push({
+
+text:c,
+
+vector:createVector(c)
+
+});
+
+
+});
+
+
+
+let html="";
+
+
+database.forEach((item,i)=>{
+
+
+html+=`
+
+<div class="chunk">
+
+<b>
+Chunk ${i+1}
+</b>
+
+<br>
+
+${item.text}
+
+<br><br>
+
+<span class="vector">
+
+Embedding:
+[${item.vector.join(",")}]
+
+</span>
+
+
+</div>
+
+
+`;
+
+});
+
+
+document.getElementById("embeddings")
+.innerHTML=html;
+
+
+activate("n4");
+
+
+}
+
+
+
+
+
+
+function similarity(a,b){
+
+
+let score=0;
+
+
+for(let i=0;i<a.length;i++)
+
+score+=Math.abs(a[i]-b[i]);
+
+
+return 1/(1+score);
+
+
+}
+
+
+
+
+function search(){
+
+
+activate("n4");
+
+
+let query=
+document.getElementById("query")
+.value;
+
+
+let qVector=createVector(query);
+
+
+
+selected=database
+
+.map(x=>({
+
+...x,
+
+score:
+similarity(qVector,x.vector)
+
+}))
+
+
+.sort((a,b)=>b.score-a.score)
+
+.slice(0,2);
+
+
+
+
+let html="";
+
+
+selected.forEach(x=>{
+
+
+html+=`
+
+<div class="chunk good">
+
+
+${x.text}
+
+
+<br>
+
+
+<span class="score">
+
+Similarity:
+${x.score.toFixed(3)}
+
+</span>
+
+
+</div>
+
+
+`;
+
+
+});
+
+
+
+document.getElementById("retrieved")
+.innerHTML=html;
+
+
+
+document.getElementById("augmented")
+.innerHTML=
+
+`
+
+<b>
+Final Prompt sent to LLM:
+</b>
+
+
+<br><br>
+
+
+Context:
+
+${selected.map(x=>x.text).join("\n")}
+
+
+<br><br>
+
+
+Question:
+
+${query}
+
+
+`;
+
+
+
+}
+
+
+
+
+
+function generate(){
+
+
+activate("n5");
+
+
+let q=
+document.getElementById("query")
+.value.toLowerCase();
+
+
+
+let answer=
+"";
+
+
+if(q.includes("vacation"))
+
+answer=
+"Employees receive 25 vacation days every year.";
+
+
+else if(q.includes("refund"))
+
+answer=
+"Refund requests must be submitted within 30 days.";
+
+
+else if(q.includes("support"))
+
+answer=
+"Premium users receive priority customer support.";
+
+
+else
+
+answer=
+"Based on retrieved context: "
++
+selected[0].text;
+
+
+
+document.getElementById("answer")
+.innerHTML=
+
+`
+
+<b>
+LLM Answer:
+</b>
+
+<br><br>
+
+${answer}
+
+
+<br><br>
+
+<small>
+Generated from:
+Query + Retrieved Context
+</small>
+
+`;
+
+}
+
+
+</script>
+
+
+</body>
+</html>
