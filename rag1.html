@@ -1,1 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>RAG Simulator</title>
 
+<style>
+* {
+    box-sizing: border-box;
+    font-family: Inter, Arial, sans-serif;
+}
+
+body {
+    margin: 0;
+    background: #0f172a;
+    color: #e2e8f0;
+}
+
+header {
+    padding: 25px;
+    text-align: center;
+    background: linear-gradient(135deg,#2563eb,#7c3aed);
+}
+
+h1 {
+    margin: 0;
+    font-size: 32px;
+}
+
+.subtitle {
+    margin-top: 10px;
+    opacity: .8;
+}
+
+.container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 25px;
+}
+
+.card {
+    background: #1e293b;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.25);
+}
+
+h2 {
+    color:#93c5fd;
+}
+
+button {
+    background:#2563eb;
+    color:white;
+    border:none;
+    padding:12px 18px;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:15px;
+}
+
+button:hover {
+    background:#1d4ed8;
+}
+
+textarea,input {
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    border-radius:10px;
+    border:none;
+    background:#0f172a;
+    color:white;
+}
+
+.step {
+    display:grid;
+    grid-template-columns:60px 1fr;
+    gap:15px;
+    align-items:center;
+    margin:15px 0;
+}
+
+.number {
+    width:45px;
+    height:45px;
+    border-radius:50%;
+    background:#2563eb;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:bold;
+}
+
+.output {
+    background:#020617;
+    padding:15px;
+    border-radius:10px;
+    margin-top:15px;
+    white-space:pre-wrap;
+    min-height:50px;
+}
+
+.chunk {
+    background:#334155;
+    padding:10px;
+    border-radius:8px;
+    margin:8px 0;
+}
+
+.vector {
+    color:#a5b4fc;
+}
+
+.highlight {
+    border:2px solid #22c55e;
+}
+
+.flow {
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.flow div {
+    flex:1;
+    min-width:150px;
+    text-align:center;
+    padding:15px;
+    background:#334155;
+    border-radius:12px;
+}
+
+.arrow {
+    color:#38bdf8;
+    font-size:24px;
+}
+
+</style>
+</head>
+
+
+<body>
+
+<header>
+<h1>🚀 RAG Simulator</h1>
+<div class="subtitle">
+Understand Retrieval Augmented Generation step-by-step
+</div>
+</header>
+
+
+<div class="container">
+
+
+<div class="card">
+
+<h2>RAG Pipeline</h2>
+
+<div class="flow">
+
+<div>📚 Documents<br>Knowledge Base</div>
+<div class="arrow">→</div>
+
+<div>✂️ Chunking</div>
+<div class="arrow">→</div>
+
+<div>🔢 Embeddings</div>
+<div class="arrow">→</div>
+
+<div>🗄 Vector DB</div>
+<div class="arrow">→</div>
+
+<div>🤖 LLM Answer</div>
+
+</div>
+
+</div>
+
+
+
+<div class="card">
+
+<h2>Step 1: Create Knowledge Base</h2>
+
+<textarea id="docs">
+Our company provides 25 vacation days every year.
+Employees can work remotely three days per week.
+Refund requests must be submitted within 30 days.
+Premium customers receive priority support.
+</textarea>
+
+<button onclick="createChunks()">
+Create Knowledge Base
+</button>
+
+
+<div id="chunks" class="output"></div>
+
+</div>
+
+
+
+<div class="card">
+
+<h2>Step 2: Generate Embeddings & Store in Vector Database</h2>
+
+<button onclick="createVectors()">
+Generate Vectors
+</button>
+
+<div id="vectors" class="output"></div>
+
+</div>
+
+
+
+<div class="card">
+
+<h2>Step 3: User Query</h2>
+
+<input id="query"
+value="How many vacation days do employees get?">
+
+<button onclick="retrieve()">
+Run Similarity Search
+</button>
+
+
+<div id="retrieval" class="output"></div>
+
+</div>
+
+
+
+<div class="card">
+
+<h2>Step 4: Augmented Prompt</h2>
+
+<div id="prompt" class="output"></div>
+
+</div>
+
+
+
+<div class="card">
+
+<h2>Step 5: Simulated LLM Generation</h2>
+
+<button onclick="generateAnswer()">
+Ask LLM
+</button>
+
+
+<div id="answer" class="output"></div>
+
+</div>
+
+
+</div>
+
+
+
+<script>
+
+let chunks=[];
+let vectors=[];
+let retrieved=[];
+
+
+
+function createChunks(){
+
+let text=document.getElementById("docs").value;
+
+chunks=text
+.split(".")
+.map(x=>x.trim())
+.filter(x=>x.length>0);
+
+
+let html="";
+
+chunks.forEach((c,i)=>{
+
+html+=`
+<div class="chunk">
+<b>Chunk ${i+1}</b><br>
+${c}.
+</div>
+`;
+
+});
+
+
+document.getElementById("chunks").innerHTML=html;
+
+
+}
+
+
+
+function fakeEmbedding(text){
+
+// simulated embedding
+let words=text.toLowerCase()
+.split(" ");
+
+let vector=[
+words.length,
+text.length,
+words.filter(w=>w.includes("vacation")).length,
+words.filter(w=>w.includes("refund")).length,
+words.filter(w=>w.includes("support")).length
+];
+
+return vector;
+
+}
+
+
+
+function createVectors(){
+
+vectors=chunks.map(c=>({
+
+text:c,
+vector:fakeEmbedding(c)
+
+}));
+
+
+let html="";
+
+
+vectors.forEach((v,i)=>{
+
+html+=`
+<div class="chunk">
+<b>Chunk ${i+1}</b><br>
+
+${v.text}<br>
+
+<span class="vector">
+Embedding:
+[${v.vector.join(", ")}]
+</span>
+
+</div>
+`;
+
+});
+
+
+document.getElementById("vectors").innerHTML=html;
+
+
+}
+
+
+
+function similarity(a,b){
+
+let score=0;
+
+for(let i=0;i<a.length;i++){
+
+score+=Math.abs(a[i]-b[i]);
+
+}
+
+return -score;
+
+}
+
+
+
+
+function retrieve(){
+
+let query=document.getElementById("query").value;
+
+let qVector=fakeEmbedding(query);
+
+
+retrieved=vectors
+.map(v=>({
+
+...v,
+score:similarity(
+qVector,
+v.vector
+)
+
+}))
+.sort((a,b)=>b.score-a.score)
+.slice(0,2);
+
+
+
+let html="<b>Retrieved Chunks:</b><br>";
+
+
+retrieved.forEach(r=>{
+
+html+=`
+<div class="chunk highlight">
+
+${r.text}<br>
+
+Similarity Score:
+${r.score}
+
+</div>
+`;
+
+});
+
+
+document.getElementById("retrieval").innerHTML=html;
+
+
+
+document.getElementById("prompt").innerHTML=
+`
+<b>Augmented Prompt:</b>
+
+You are an AI assistant.
+
+Use the following context:
+
+${retrieved.map(r=>r.text).join("\n")}
+
+
+Question:
+
+${query}
+
+Answer using only the provided context.
+`;
+
+}
+
+
+
+
+function generateAnswer(){
+
+if(retrieved.length===0){
+
+alert("Run similarity search first");
+
+return;
+
+}
+
+
+let query=document.getElementById("query").value.toLowerCase();
+
+
+let answer="";
+
+
+if(query.includes("vacation")){
+
+answer="Employees receive 25 vacation days every year.";
+
+}
+
+else if(query.includes("refund")){
+
+answer="Refund requests must be submitted within 30 days.";
+
+}
+
+else if(query.includes("support")){
+
+answer="Premium customers receive priority support.";
+
+}
+
+else{
+
+answer="Based on the retrieved context: "
++
+retrieved[0].text;
+
+}
+
+
+
+document.getElementById("answer").innerHTML=
+`
+<b>LLM Response:</b>
+
+${answer}
+
+<br><br>
+
+✅ Generated using:
+<br>
+User Query + Retrieved Context
+`;
+
+}
+
+
+</script>
+
+
+</body>
+</html>
